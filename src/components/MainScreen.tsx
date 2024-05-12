@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import MainLocationCard from './MainLocationCard';
 import { Geolocation } from '@capacitor/geolocation';
 import { IonButton, IonSpinner } from '@ionic/react';
@@ -60,13 +60,26 @@ function MainScreen() {
     }
 
     // Función para eliminar del almacenmiento dada una key
+    
     async function deleteFromStore(key: string) {
         // Se elimina del almacenamiento y se actualiza la lista de oldLocations
         await store.remove(key);
+        closeAllIonItems();
         await getOldLocations();
+        await Toast.show({
+            text: '¡Aparcamiento eliminado!'
+        });
     }
 
-    //Función para obtener la última location guardada, que será la MainLocation.
+    // Función para cerrar todos los IonItems de la lista de oldLocations
+    const oldLocationsListRef = useRef<HTMLIonListElement>(null);
+    function closeAllIonItems(){
+        if (oldLocationsListRef.current) {
+            oldLocationsListRef.current.closeSlidingItems();
+        }
+    }
+
+    // Función para obtener la última location guardada, que será la MainLocation.
     async function getMainLocation() {
  
         try {
@@ -197,7 +210,7 @@ function MainScreen() {
 
             <section className='locationsContainer'>
                 <div>
-                    <IonList >
+                    <IonList ref={oldLocationsListRef}>
                         {oldLocations.map((oldLocation, index) => (
                             <IonItemSliding key={index} className='margin-bottom-1halfrem'>  
                                 <IonItem>
