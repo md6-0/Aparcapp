@@ -7,7 +7,6 @@ function MainLocationCard({ lat, long, date, streetName, imageURL}: { lat: strin
 
     return(
         <a href={googleMapsUrl}>
-            
             <div className='mainLocationCardContainer'>
                 <div className='mainLocationCardMapImgGradient'>
                     <img className='mainLocationCardMapImg' src={imageURL}/>

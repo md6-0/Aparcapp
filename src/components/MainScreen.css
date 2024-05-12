@@ -1,3 +1,24 @@
+ion-item-sliding{
+    overflow: visible;
+}
+ion-item-sliding .item{
+    overflow: visible;
+}
+ion-list{
+    contain: unset;
+}
+.mainLocationCardShadow {
+    background: transparent;
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, .4) 0px 4px 10px;   
+}
+
+.oldLocationCardShadow {
+    background: transparent;
+    border-radius: 25px;
+    box-shadow: rgba(0, 0, 0, .4) 0px 4px 10px;    
+}
+
 .mainContainer{  
     align-items: center;
     display: flex;
@@ -32,9 +53,11 @@
 .saveBtn{
     bottom: 5%;
     border-radius: 18px;
+    box-shadow: rgba(0, 0, 0, .4) 0px 4px 10px;    
     height: 3.5rem;
     position: absolute;
     overflow: hidden;
+    z-index: 1;
 }
     .saveBtnDisabled{
         opacity: 1;

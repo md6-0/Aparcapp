@@ -1,19 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import MainLocationCard from './MainLocationCard';
+import SubLocationCard from './SubLocationCard';
 import { Geolocation } from '@capacitor/geolocation';
-import { IonButton, IonSpinner } from '@ionic/react';
-import { IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonList } from '@ionic/react';
+import { IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonList, IonButton, IonSpinner } from '@ionic/react';
 import { Storage } from '@ionic/storage';
 import { Toast } from '@capacitor/toast';
 import './MainScreen.css';
-import SubLocationCard from './SubLocationCard';
 
 // Interfaz para los objetos que se guardarán en el almacenamiento
 interface Coordinates {
     Key: string,
     Lat: string;
     Long: string;
-    DateTime: string; 
+    DateTime: string;
     StreetName: string;
     ImgURL: string;
 }
@@ -40,27 +39,26 @@ function MainScreen() {
 
         // Se obtienen todas las claves y se almacenan en un array de números.
         const keys = await store.keys();
-        let orderedKeys :number[] = [];
+        let orderedKeys: number[] = [];
         keys.forEach((value) => {
             orderedKeys.push(parseInt(value));
         })
         // Se ordena el array de menor a mayor
-        orderedKeys.sort((n1,n2) => n1 - n2);        
-        
+        orderedKeys.sort((n1, n2) => n1 - n2);
+
         // Si el array es vacio, no hay locations.
         // Si está lleno, se obtiene el último item, ya que será la mainLocation porque es el último que se añadió.
-        let lastKeyAdded: number;        
-        if(keys.length > 0){
+        let lastKeyAdded: number;
+        if (keys.length > 0) {
             lastKeyAdded = orderedKeys[orderedKeys.length - 1]
-        }else{
+        } else {
             lastKeyAdded = 0;
         }
-  
+
         return lastKeyAdded;
     }
 
-    // Función para eliminar del almacenmiento dada una key
-    
+    // Función para eliminar del almacenamiento dada una key
     async function deleteFromStore(key: string) {
         // Se elimina del almacenamiento y se actualiza la lista de oldLocations
         await store.remove(key);
@@ -73,7 +71,7 @@ function MainScreen() {
 
     // Función para cerrar todos los IonItems de la lista de oldLocations
     const oldLocationsListRef = useRef<HTMLIonListElement>(null);
-    function closeAllIonItems(){
+    function closeAllIonItems() {
         if (oldLocationsListRef.current) {
             oldLocationsListRef.current.closeSlidingItems();
         }
@@ -81,7 +79,7 @@ function MainScreen() {
 
     // Función para obtener la última location guardada, que será la MainLocation.
     async function getMainLocation() {
- 
+
         try {
             // Se obtiene la MainLocation
             const lastAddedKey = await getLastAddedKey();
@@ -112,14 +110,14 @@ function MainScreen() {
                 locations.push(JSON.parse(coords));
             }
             // Se elimina el primer item del array, que será la mainLocation porque es la última en haber sido añadida
-            locations.shift()            
+            locations.shift()
             // Se actualiza la lista de oldLocations mediante el state.
             setLocations(locations);
         } catch (error) {
             console.error('Error al obtener las ubicaciones:', error);
         }
     }
-    
+
 
     // Función para obtener el nombre de la calle mediante las coordenadas gps.
     async function getStreetNameByCoords(lat: string, lon: string) {
@@ -130,14 +128,14 @@ function MainScreen() {
             const data = await response.json();
             streetName = data.results[0].components.road;
             // Si la respuesta trae el número de la calle, se concatena al nombre de la calle
-            if(data.results[0].components.house_number!=undefined){streetName = streetName + ", " + data.results[0].components.house_number }
+            if (data.results[0].components.house_number != undefined) { streetName = streetName + ", " + data.results[0].components.house_number }
             // Se pone la primera letra del nombre de la calle a mayúscula
             streetName = streetName.charAt(0).toUpperCase() + streetName.slice(1);
             //Si el nombre de la calle es muy largo, se hace una elipsis
-            streetName = streetName.length > 40 ? streetName.substring(0, 38  ) + '...' : streetName;
+            streetName = streetName.length > 40 ? streetName.substring(0, 38) + '...' : streetName;
             return streetName;
         } catch (error) {
-            return ""; 
+            return "";
         }
     }
 
@@ -151,10 +149,10 @@ function MainScreen() {
             const keyToAdd = (lastAddedKey + 1).toString()
 
             //Obtenemos las coordenadas GPS y el nombre de la calle
-            const position = await Geolocation.getCurrentPosition({enableHighAccuracy: true});
+            const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
             const streetName = await getStreetNameByCoords(position.coords.latitude.toString(), position.coords.longitude.toString());
             // Formateamos la fecha y hora actual
-            const currentDateTime = formatDateTime(new Date()); 
+            const currentDateTime = formatDateTime(new Date());
             //Creamos un objeto para guardar la información de la location.
             const coords: Coordinates = {
                 Key: keyToAdd,
@@ -173,14 +171,14 @@ function MainScreen() {
             await Toast.show({
                 text: '¡Aparcamiento guardado!'
             });
-            } catch (error) {
-                setShowSpinner(false);
-                await Toast.show({
-                    text: 'Error al obtener las coordenadas. Asegúrese de encender la ubicación.',
-                    duration: 'long'
-                });
-                
-            }
+        } catch (error) {
+            setShowSpinner(false);
+            await Toast.show({
+                text: 'Error al obtener las coordenadas. Asegúrese de encender la ubicación.',
+                duration: 'long'
+            });
+
+        }
     }
 
     // Función para formatear la fecha a "DD/MM/YYYY HH:MM:SS"
@@ -194,14 +192,17 @@ function MainScreen() {
         return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     }
 
-   
+
     return (
         <div className='mainContainer'>
             <section className='mainLocationContainer'>
                 <div className='mainLocationContainerTitle'>
                     <h1>Último aparcamiento</h1>
                 </div>
-                {mainLocation && <MainLocationCard lat={mainLocation.Lat} long={mainLocation.Long} date={mainLocation.DateTime} streetName={mainLocation.StreetName} imageURL={mainLocation.ImgURL} />}
+                <div className='mainLocationCardShadow'>
+                    {mainLocation && <MainLocationCard lat={mainLocation.Lat} long={mainLocation.Long} date={mainLocation.DateTime} streetName={mainLocation.StreetName} imageURL={mainLocation.ImgURL} />}
+                </div>
+                
             </section>
 
             <div className='subLocationContainerTitle'>
@@ -212,12 +213,14 @@ function MainScreen() {
                 <div>
                     <IonList ref={oldLocationsListRef}>
                         {oldLocations.map((oldLocation, index) => (
-                            <IonItemSliding key={index} className='margin-bottom-1halfrem'>  
+                            <IonItemSliding key={index} className='margin-bottom-1halfrem'>
                                 <IonItem>
-                                    <SubLocationCard key={oldLocation.Key} lat={oldLocation.Lat} long={oldLocation.Long} date={oldLocation.DateTime} streetName={oldLocation.StreetName} imageURL={oldLocation.ImgURL} />
-                                </IonItem> 
+                                    <div className='oldLocationCardShadow'>
+                                         <SubLocationCard key={oldLocation.Key} lat={oldLocation.Lat} long={oldLocation.Long} date={oldLocation.DateTime} streetName={oldLocation.StreetName} imageURL={oldLocation.ImgURL} />
+                                    </div>
+                                </IonItem>
                                 <IonItemOptions>
-                                    <IonItemOption className="customIonOption" color="danger" onClick={() => {deleteFromStore((oldLocation.Key).toString());}}> Eliminar </IonItemOption>
+                                    <IonItemOption className="customIonOption" color="danger" onClick={() => { deleteFromStore((oldLocation.Key).toString()); }}> Eliminar </IonItemOption>
                                 </IonItemOptions>
                             </IonItemSliding>
                         ))}
@@ -225,7 +228,7 @@ function MainScreen() {
                 </div>
             </section>
             <IonButton className={showSpinner ? 'saveBtn saveBtnDisabled' : 'saveBtn'} disabled={showSpinner} onClick={getAndSetGPS}>{showSpinner ? 'Guardando aparcamiento...' : 'Guardar aparcamiento'}
-            {showSpinner && <IonSpinner className='spinner' name="crescent" />}
+                {showSpinner && <IonSpinner className='spinner' name="crescent" />}
             </IonButton>
 
         </div>
