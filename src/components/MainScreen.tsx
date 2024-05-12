@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import MainLocationCard from './MainLocationCard';
 import { Geolocation } from '@capacitor/geolocation';
 import { IonButton, IonSpinner } from '@ionic/react';
-import { IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList } from '@ionic/react';
+import { IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonList } from '@ionic/react';
 import { Storage } from '@ionic/storage';
 import { Toast } from '@capacitor/toast';
 import './MainScreen.css';
 import SubLocationCard from './SubLocationCard';
 
+// Interfaz para los objetos que se guardarán en el almacenamiento
 interface Coordinates {
     Key: string,
     Lat: string;
@@ -21,29 +22,33 @@ store.create();
 
 function MainScreen() {
 
-    //Ejecutar al inicializar, sólo se ejecuta 1 vez.
+    // Se ejecuta sólo al inicializar. Obtenemos la mainLocation y las oldLocations.
     useEffect(() => {
         getMainLocation();
-        getLocations(false);
+        getOldLocations();
     }, []);
 
-    //Creamos un State para poder actualizar la MainLocation
+    // Se crea un State para poder actualizar la MainLocation
     const [mainLocation, setMainLocation] = useState<Coordinates | null>(null);
-    // State para almacenar la lista de ubicaciones
+    // Se crea un State para poder actualizar las oldLocations
     const [oldLocations, setLocations] = useState<Coordinates[]>([]);
-    //State para almacenar el status del spinner
+    // Se crea un State para poder actualizar el estado del spinner
     const [showSpinner, setShowSpinner] = useState(false);
 
     //Función para obtener la úlitma key guardada
     async function getLastAddedKey() {
-       
+
+        // Se obtienen todas las claves y se almacenan en un array de números.
         const keys = await store.keys();
         let orderedKeys :number[] = [];
         keys.forEach((value) => {
             orderedKeys.push(parseInt(value));
         })
+        // Se ordena el array de menor a mayor
         orderedKeys.sort((n1,n2) => n1 - n2);        
         
+        // Si el array es vacio, no hay locations.
+        // Si está lleno, se obtiene el último item, ya que será la mainLocation porque es el último que se añadió.
         let lastKeyAdded: number;        
         if(keys.length > 0){
             lastKeyAdded = orderedKeys[orderedKeys.length - 1]
@@ -54,49 +59,48 @@ function MainScreen() {
         return lastKeyAdded;
     }
 
-    //Función para eliminar de indexedDB dada una key
+    // Función para eliminar del almacenmiento dada una key
     async function deleteFromStore(key: string) {
+        // Se elimina del almacenamiento y se actualiza la lista de oldLocations
         await store.remove(key);
-        console.log("Key: " + key + " eliminada." );
-        await getLocations(true);
+        await getOldLocations();
     }
 
-    //Función para obtener la última location guardada. Será la MainLocation.
+    //Función para obtener la última location guardada, que será la MainLocation.
     async function getMainLocation() {
  
         try {
-            //Obtenemos el número total de locations
+            // Se obtiene la MainLocation
             const lastAddedKey = await getLastAddedKey();
-            //Obtenemos la última location guardada, será la MainLocation
             const coords = await store.get(lastAddedKey.toString());
+
             //Si no hay MainLocation, seteamos a null.
-            //Si hay MainLocation en indexedDB, la guardamos en el State mainLocation
+            //Si hay MainLocation, la guardamos en el State mainLocation
             if (coords === null) {
-                console.log("No hay mainLocation");
                 setMainLocation(null);
             } else {
-                console.log("mainLocation encontrada");
                 const location: Coordinates = JSON.parse(coords);
                 setMainLocation(location);
             }
-
         } catch (error) {
             console.error("Error al obtener la ubicación principal:", error);
         }
     }
 
-    //Función para obtener todas las locations menos la más reciente.
-    async function getLocations(isDeleting: boolean) {
+    // Función para obtener las oldLocations (todas menos la mainLocation)
+    async function getOldLocations() {
         try {
+            // Se obtienen las claves, se guardan en un array de números y se ordenan de mayor a menor
             const keys = await store.keys();
             const orderedKeys = keys.map(value => parseInt(value)).sort((n1, n2) => n2 - n1);
-            
             const locations = [];
             for (const value of orderedKeys) {
                 const coords = await store.get(value.toString());
                 locations.push(JSON.parse(coords));
             }
-            locations.shift()
+            // Se elimina el primer item del array, que será la mainLocation porque es la última en haber sido añadida
+            locations.shift()            
+            // Se actualiza la lista de oldLocations mediante el state.
             setLocations(locations);
         } catch (error) {
             console.error('Error al obtener las ubicaciones:', error);
@@ -104,19 +108,22 @@ function MainScreen() {
     }
     
 
-    //Función para obtener el nombre de la calle mediante las coordenadas gps.
+    // Función para obtener el nombre de la calle mediante las coordenadas gps.
     async function getStreetNameByCoords(lat: string, lon: string) {
         try {
+            // Se hace la petición a openCageData para obtener el nombre de la calle
             let streetName: string;
             const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=a65dba87c0584f8b907f8758e6b4461b&language=es&no_annotations=1&pretty=1`);
             const data = await response.json();
             streetName = data.results[0].components.road;
-            if(data.results[0].components.house_number!=undefined){streetName = streetName + " " + data.results[0].components.house_number }
+            // Si la respuesta trae el número de la calle, se concatena al nombre de la calle
+            if(data.results[0].components.house_number!=undefined){streetName = streetName + ", " + data.results[0].components.house_number }
+            // Se pone la primera letra del nombre de la calle a mayúscula
             streetName = streetName.charAt(0).toUpperCase() + streetName.slice(1);
+            //Si el nombre de la calle es muy largo, se hace una elipsis
             streetName = streetName.length > 40 ? streetName.substring(0, 38  ) + '...' : streetName;
             return streetName;
         } catch (error) {
-            console.error('Error al obtener la dirección:', error);
             return ""; 
         }
     }
@@ -131,7 +138,7 @@ function MainScreen() {
             const keyToAdd = (lastAddedKey + 1).toString()
 
             //Obtenemos las coordenadas GPS y el nombre de la calle
-            const position = await Geolocation.getCurrentPosition({enableHighAccuracy: true, maximumAge: 0});
+            const position = await Geolocation.getCurrentPosition({enableHighAccuracy: true});
             const streetName = await getStreetNameByCoords(position.coords.latitude.toString(), position.coords.longitude.toString());
             // Formateamos la fecha y hora actual
             const currentDateTime = formatDateTime(new Date()); 
@@ -144,19 +151,17 @@ function MainScreen() {
                 StreetName: streetName,
                 ImgURL: "https://staticmapmaker.com/img/google-placeholder.png"
             };
-            //Guardamos el objeto en IndexedDB
+            //Guardamos el objeto en almacenamiento
             await store.set(keyToAdd, JSON.stringify(coords));
-            //Obtenemos la MainLocation para actulizar la tarjeta principal
+            //Obtenemos las locations para actulizar la pantalla
             await getMainLocation();
-            await getLocations(false);
+            await getOldLocations();
             setShowSpinner(false);
             await Toast.show({
-                text: '¡Aparcamiento guardado!',
-                duration: 'long'
+                text: '¡Aparcamiento guardado!'
             });
             } catch (error) {
                 setShowSpinner(false);
-                console.error("Error al obtener y establecer la ubicación GPS:", error);
                 await Toast.show({
                     text: 'Error al obtener las coordenadas. Asegúrese de encender la ubicación.',
                     duration: 'long'
@@ -183,7 +188,6 @@ function MainScreen() {
                 <div className='mainLocationContainerTitle'>
                     <h1>Último aparcamiento</h1>
                 </div>
-                
                 {mainLocation && <MainLocationCard lat={mainLocation.Lat} long={mainLocation.Long} date={mainLocation.DateTime} streetName={mainLocation.StreetName} imageURL={mainLocation.ImgURL} />}
             </section>
 
