@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MainLocationCard from './MainLocationCard';
 import { Geolocation } from '@capacitor/geolocation';
 import { IonButton, IonSpinner } from '@ionic/react';
