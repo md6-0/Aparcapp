@@ -1,0 +1,7 @@
+{
+  "name": "Apparcar",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
