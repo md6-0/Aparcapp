@@ -27,8 +27,8 @@ ion-list{
 }
 
     .mainLocationContainer{
-        margin-top: 2.5rem;
-        margin-bottom: 4rem;
+        margin-top: 1rem;
+        margin-bottom: 3.5rem;
     }
 
     .mainLocationContainerTitle{
@@ -51,7 +51,7 @@ ion-list{
     }
 
 .saveBtn{
-    bottom: 5%;
+    bottom: 12%;
     border-radius: 18px;
     box-shadow: rgba(0, 0, 0, .4) 0px 4px 10px;    
     height: 3.5rem;

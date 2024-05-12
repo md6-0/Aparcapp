@@ -32,7 +32,7 @@ a{
 
     .sublocationCardMapImgGradient:after {
         content:'';
-        background: linear-gradient(to bottom, rgba(209, 209, 209, 1) 0%,rgb(0, 0, 0, 0.4) 40%);
+        background: linear-gradient(to bottom, rgb(209, 209, 209) 0%,rgba(0, 0, 0, 0.4) 0%);
         border-radius: 25px;
         position: absolute;
         left: 0; 

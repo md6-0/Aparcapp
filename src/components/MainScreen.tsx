@@ -6,6 +6,8 @@ import { IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonList, IonBut
 import { Storage } from '@ionic/storage';
 import { Toast } from '@capacitor/toast';
 import './MainScreen.css';
+ // Assuming logo.png is in the same folder as JS file
+ import cardBackground from '../images/cardBackground.png';
 
 // Interfaz para los objetos que se guardarán en el almacenamiento
 interface Coordinates {
@@ -160,7 +162,7 @@ function MainScreen() {
                 Long: position.coords.longitude.toString(),
                 DateTime: currentDateTime,
                 StreetName: streetName,
-                ImgURL: "https://staticmapmaker.com/img/google-placeholder.png"
+                ImgURL: cardBackground
             };
             //Guardamos el objeto en almacenamiento
             await store.set(keyToAdd, JSON.stringify(coords));
