@@ -5,6 +5,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonList, IonButton, IonSpinner } from '@ionic/react';
 import { Storage } from '@ionic/storage';
 import { Toast } from '@capacitor/toast';
+import { App } from '@capacitor/app';
 import './MainScreen.css';
  // Assuming logo.png is in the same folder as JS file
 import cardBackground from '../images/cardBackground.png';
@@ -23,6 +24,15 @@ const store = new Storage();
 store.create();
 
 function MainScreen() {
+
+    //Listener para que el botón físico de atrás cierre la app
+    App.addListener('backButton', ({ canGoBack }) => {
+        if(canGoBack){
+          window.history.back();
+        } else {
+          App.exitApp();
+        }
+      });
 
     // Se ejecuta sólo al inicializar. Obtenemos la mainLocation y las oldLocations.
     useEffect(() => {
@@ -212,11 +222,12 @@ function MainScreen() {
                         
                     </section>
 
-                    <div className='subLocationContainerTitle'>
-                        <h3>Aparcamientos anteriores</h3>
-                    </div>
+                    
 
                     <section className='locationsContainer'>
+                        <div className='subLocationContainerTitle'>
+                            <h3>Aparcamientos anteriores</h3>
+                        </div>
                         <div>
                             <IonList ref={oldLocationsListRef}>
                                 {oldLocations.map((oldLocation, index) => (

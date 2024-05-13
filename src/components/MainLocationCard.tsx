@@ -3,7 +3,7 @@ export default MainLocationCard;
 
 function MainLocationCard({ lat, long, date, streetName, imageURL}: { lat: string, long: string, date: string, streetName: string,  imageURL: string }) {
     
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${long}`+ "&travelmode=walking";
+    const googleMapsUrl = `https://maps.google.com?q=${lat},${long}`;
 
     return(
         <a href={googleMapsUrl}>

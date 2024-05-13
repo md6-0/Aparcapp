@@ -27,7 +27,10 @@ ion-list{
 }
 
     .mainLocationContainer{
-        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 2rem;
         margin-bottom: 3.5rem;
     }
 
@@ -40,6 +43,12 @@ ion-list{
             font-weight: bolder;
         }
 
+.locationsContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+}
+
 .subLocationContainerTitle{
     text-align: left;
     width: 300px;
@@ -49,6 +58,7 @@ ion-list{
         font-weight: default;
         margin:0;
     }
+
 
 .saveBtn{
     bottom: 12%;
