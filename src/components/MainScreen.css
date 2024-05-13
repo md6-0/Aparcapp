@@ -77,3 +77,19 @@ ion-list{
         --border-color: transparent;
         opacity:1;
     }
+
+
+.emptyStateContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-weight: bold;
+    height: 100vh;
+    transform: translateY(-2%);
+}
+
+.emptyStateContainer > img {
+    margin-top: 2rem;
+	max-width: 40%;
+}

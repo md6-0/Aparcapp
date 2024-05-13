@@ -7,7 +7,8 @@ import { Storage } from '@ionic/storage';
 import { Toast } from '@capacitor/toast';
 import './MainScreen.css';
  // Assuming logo.png is in the same folder as JS file
- import cardBackground from '../images/cardBackground.png';
+import cardBackground from '../images/cardBackground.png';
+import emptyStateCarImg from '../images/emptyStateCar.svg';
 
 // Interfaz para los objetos que se guardarán en el almacenamiento
 interface Coordinates {
@@ -95,6 +96,7 @@ function MainScreen() {
                 const location: Coordinates = JSON.parse(coords);
                 setMainLocation(location);
             }
+            console.log(location)
         } catch (error) {
             console.error("Error al obtener la ubicación principal:", error);
         }
@@ -197,38 +199,51 @@ function MainScreen() {
 
     return (
         <div className='mainContainer'>
-            <section className='mainLocationContainer'>
-                <div className='mainLocationContainerTitle'>
-                    <h1>Último aparcamiento</h1>
-                </div>
-                <div className='mainLocationCardShadow'>
-                    {mainLocation && <MainLocationCard lat={mainLocation.Lat} long={mainLocation.Long} date={mainLocation.DateTime} streetName={mainLocation.StreetName} imageURL={mainLocation.ImgURL} />}
-                </div>
-                
-            </section>
 
-            <div className='subLocationContainerTitle'>
-                <h3>Aparcamientos anteriores</h3>
-            </div>
+            {mainLocation !== null && 
+                <div className='locationsContainer'>
+                    <section className='mainLocationContainer'>
+                        <div className='mainLocationContainerTitle'>
+                            <h1>Último aparcamiento</h1>
+                        </div>
+                        <div className='mainLocationCardShadow'>
+                            {mainLocation && <MainLocationCard lat={mainLocation.Lat} long={mainLocation.Long} date={mainLocation.DateTime} streetName={mainLocation.StreetName} imageURL={mainLocation.ImgURL} />}
+                        </div>
+                        
+                    </section>
 
-            <section className='locationsContainer'>
-                <div>
-                    <IonList ref={oldLocationsListRef}>
-                        {oldLocations.map((oldLocation, index) => (
-                            <IonItemSliding key={index} className='margin-bottom-1halfrem'>
-                                <IonItem>
-                                    <div className='oldLocationCardShadow'>
-                                         <SubLocationCard key={oldLocation.Key} lat={oldLocation.Lat} long={oldLocation.Long} date={oldLocation.DateTime} streetName={oldLocation.StreetName} imageURL={oldLocation.ImgURL} />
-                                    </div>
-                                </IonItem>
-                                <IonItemOptions>
-                                    <IonItemOption className="customIonOption" color="danger" onClick={() => { deleteFromStore((oldLocation.Key).toString()); }}> Eliminar </IonItemOption>
-                                </IonItemOptions>
-                            </IonItemSliding>
-                        ))}
-                    </IonList>
+                    <div className='subLocationContainerTitle'>
+                        <h3>Aparcamientos anteriores</h3>
+                    </div>
+
+                    <section className='locationsContainer'>
+                        <div>
+                            <IonList ref={oldLocationsListRef}>
+                                {oldLocations.map((oldLocation, index) => (
+                                    <IonItemSliding key={index} className='margin-bottom-1halfrem'>
+                                        <IonItem>
+                                            <div className='oldLocationCardShadow'>
+                                                <SubLocationCard key={oldLocation.Key} lat={oldLocation.Lat} long={oldLocation.Long} date={oldLocation.DateTime} streetName={oldLocation.StreetName} imageURL={oldLocation.ImgURL} />
+                                            </div>
+                                        </IonItem>
+                                        <IonItemOptions>
+                                            <IonItemOption className="customIonOption" color="danger" onClick={() => { deleteFromStore((oldLocation.Key).toString()); }}> Eliminar </IonItemOption>
+                                        </IonItemOptions>
+                                    </IonItemSliding>
+                                ))}
+                            </IonList>
+                        </div>
+                    </section>
                 </div>
-            </section>
+            }
+
+            {mainLocation == null && 
+                <div className='emptyStateContainer'>
+                    <p>Aún no hay aparcamientos guardados</p>  
+                    <img className='emptySateCarImg' src={emptyStateCarImg}/>                     
+                </div>
+            }
+
             <IonButton className={showSpinner ? 'saveBtn saveBtnDisabled' : 'saveBtn'} disabled={showSpinner} onClick={getAndSetGPS}>{showSpinner ? 'Guardando aparcamiento...' : 'Guardar aparcamiento'}
                 {showSpinner && <IonSpinner className='spinner' name="crescent" />}
             </IonButton>
