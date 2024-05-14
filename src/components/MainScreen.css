@@ -72,6 +72,9 @@ ion-list{
     .saveBtnDisabled{
         opacity: 1;
     }
+        .saveBtn{
+            --background: #50c7e0;
+        }
 
     .spinner{
         margin-left: 5px;

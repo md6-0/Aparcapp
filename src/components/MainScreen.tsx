@@ -7,6 +7,7 @@ import { Storage } from '@ionic/storage';
 import { Toast } from '@capacitor/toast';
 import { App } from '@capacitor/app';
 import './MainScreen.css';
+import Geocoding_API_Key from '../API_KEY'
  // Assuming logo.png is in the same folder as JS file
 import cardBackground from '../images/cardBackground.png';
 import emptyStateCarImg from '../images/emptyStateCar.svg';
@@ -106,7 +107,6 @@ function MainScreen() {
                 const location: Coordinates = JSON.parse(coords);
                 setMainLocation(location);
             }
-            console.log(location)
         } catch (error) {
             console.error("Error al obtener la ubicación principal:", error);
         }
@@ -132,13 +132,12 @@ function MainScreen() {
         }
     }
 
-
     // Función para obtener el nombre de la calle mediante las coordenadas gps.
     async function getStreetNameByCoords(lat: string, lon: string) {
         try {
             // Se hace la petición a openCageData para obtener el nombre de la calle
             let streetName: string;
-            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=a65dba87c0584f8b907f8758e6b4461b&language=es&no_annotations=1&pretty=1`);
+            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=${Geocoding_API_Key}&language=es&no_annotations=1&pretty=1`);
             const data = await response.json();
             streetName = data.results[0].components.road;
             // Si la respuesta trae el número de la calle, se concatena al nombre de la calle
