@@ -137,7 +137,7 @@ function MainScreen() {
         try {
             // Se hace la petición a openCageData para obtener el nombre de la calle
             let streetName: string;
-            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=${Geocoding_API_Key}&language=es&no_annotations=1&pretty=1`);
+            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat},${lon}&key=${Geocoding_API_Key}&language=es&no_annotations=1&pretty=1&no_record=1`);
             const data = await response.json();
             streetName = data.results[0].components.road;
             // Si la respuesta trae el número de la calle, se concatena al nombre de la calle
